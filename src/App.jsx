@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
+import {useEffect, useState} from "react";
+import axios from "axios";
 function App() {
-  const [count, setCount] = useState(0)
+    const [status_lampu, setStatus_lampu] = useState("lampu mati");
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    useEffect(()=>{
+      async function requestSekali(){
+        const url = import.meta.env.VITE_BACKEND_API;
+        const res = await axios.get(`${url}/api/lampu/all`);
+        const result = res.data;
+        setStatus_lampu(`lampu ${result.status_lampu}`)
+      }
+      requestSekali();
+    },[]);
+    const handleKlik = async (e) => {
+        e.preventDefault();
+        const url = import.meta.env.VITE_BACKEND_API;
+        const res = await axios.put(`${url}/api/lampu/update`);
+        const result = res.data;
+        setStatus_lampu(result.message)
+    };
+    return (
+        <>
+            <div className="p-6 bg-white rounded-2xl shadow-md text-center select-none space-y-4">
+                <h1 className="text-xl font-semibold">Kontrol Lampu</h1>
+
+                {/* STATUS LAMPU */}
+                <div
+                    id="lamp-status"
+                    className="px-4 py-2 rounded-xl font-semibold text-sm 
+                   bg-gray-200 text-gray-600"
+                >
+                   {status_lampu}
+                </div>
+
+                <button
+                    onClick={handleKlik}
+                    className="px-6 py-3 bg-yellow-500 text-white font-semibold rounded-xl hover:bg-yellow-600 transition"
+                >
+                    Nyalakan Lampu
+                </button>
+            </div>
+        </>
+    );
 }
 
-export default App
+export default App;
